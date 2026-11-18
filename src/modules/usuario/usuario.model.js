@@ -3,14 +3,12 @@ import db from "../../config/dbconexion.js";
 import bcrypt from "bcryptjs";
 
 export const UserModel = {
-  findALL: async () => {
-    const sql = "SELECT * FROM usuario ORDER BY apellidos";
-
-    //almacenamos la respuesta en un arreglo
-
-    const [rows] = await db.query(sql);
-
-    return rows;
+  findALL: async (page, limit) => {
+    const sql =
+      "SELECT * FROM usuario ORDER BY apellidos, id_usuario LIMIT ? OFFSET ?";
+    const [rows] = await db.query(sql, [limit, (page - 1) * limit]);
+    const [count] = await db.query("SELECT COUNT(*) AS total FROM usuario");
+    return { results: rows, total: count[0].total };
   },
   findById: async (id) => {
     const sql = "SELECT * FROM usuario WHERE id_usuario=?";
@@ -33,7 +31,7 @@ export const UserModel = {
       [email],
     );
     if (emailExiste.length > 0) {
-      //dispara el gestor de errores de node js y le crea el error   
+      //dispara el gestor de errores de node js y le crea el error
       throw new Error("El email ya está registrado");
     }
     const userNuevo = {
