@@ -2,3 +2,4 @@
 /.env
 /env.examples
 /db_usuario.sql
+/usuario.sql
